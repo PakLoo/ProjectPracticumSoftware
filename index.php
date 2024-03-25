@@ -10,11 +10,13 @@ use Slim\Factory\AppFactory;
 require __DIR__ . '/vendor/autoload.php';
 
 $app = AppFactory::create();
-$app->setBasePath('/General');
+$app->setBasePath('/ProjectPracticumSoftware');
 
 require __DIR__ . '/api/General.php';
 require __DIR__ . '/api/member.php';
 require __DIR__ . '/api/admin.php';
 require __DIR__ . '/Connect.php';
+
+
 
 $app->run();
