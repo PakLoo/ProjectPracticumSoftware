@@ -8,7 +8,7 @@ use Psr\Http\Message\MessageInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 
-$app->post('/SignUp', 
+$app->post('/general', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
@@ -25,12 +25,35 @@ return $response->withHeader('Content-Type', 'application/json');
 
 });
 
-$app->get('/hello', 
-        function (Request $request, Response $response, array $args){
-    $response->getBody()->write("Hello world!!");
-    return $response;
+$app->get('/generalZoneBooth', function (Request $request, Response $response, array $args){
+        $conn = $GLOBALS['conn'];
+        $sql = "select concat(firstName,' ',lastName)as name, email,jobTitle from employees";
+        $result = $conn->query($sql);
+        $data = array();
+        while($row = $result->fetch_assoc()){
+            array_push($data, $row);
+        }
+        $json = json_encode($data);
+        $response->getBody()->write($json);
+        return $response->withHeader('Content-Type', 'application/json');
+    
+    
 });
 
+$app->get('/generalDetailBooth', function (Request $request, Response $response, array $args){
+        $conn = $GLOBALS['conn'];
+        $sql = "select concat(firstName,' ',lastName)as name, email,jobTitle from employees";
+        $result = $conn->query($sql);
+        $data = array();
+        while($row = $result->fetch_assoc()){
+            array_push($data, $row);
+        }
+        $json = json_encode($data);
+        $response->getBody()->write($json);
+        return $response->withHeader('Content-Type', 'application/json');
+    
+    
+});
 
 
 
