@@ -6,4 +6,10 @@ $username = "u583789277_LabdbG15"; //user account ที่กําหนดใ
 $password = "Chairman2567"; //รหัสผ่านที่กําหนดให้
 $dbname = "u583789277_LabdbG15"; //ชื่อฐานข้อมูลที่กําหนดให้
 
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
 ?>
