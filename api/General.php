@@ -25,7 +25,11 @@ return $response->withHeader('Content-Type', 'application/json');
 
 });
 
-
+$app->get('/hello', 
+        function (Request $request, Response $response, array $args){
+    $response->getBody()->write("Hello world!!");
+    return $response;
+});
 
 
 
