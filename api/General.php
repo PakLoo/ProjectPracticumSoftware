@@ -8,7 +8,7 @@ use Psr\Http\Message\MessageInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $app->post('/SingUp', 
+    $app->post('/SignUp', 
             function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $body = $request->getParsedBody();
