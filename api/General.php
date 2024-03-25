@@ -14,12 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     $body = $request->getBody();
     $bodyArray = json_decode($body, true);
     $stmt = $conn->prepare("insert into members " . "(titlename, firstName, lastName, 
-                            lastname, telephone, email , password)".
+                            telephone, email , password)".
                             " values (?,?,?,?,?,?,?)");
-    $stmt->bind_param("isssssis",
-                        $bodyArray['empid'], $bodyArray['lastname'], $bodyArray['firstname'],
-                        $bodyArray['ext'], $bodyArray['mail'], $bodyArray['offcode'],
-                        $bodyArray['report'], $bodyArray['jobname']);
+    $stmt->bind_param("ssssss",
+                        $bodyArray['titlename'], $bodyArray['firstName'], $bodyArray['lastName'],
+                        $bodyArray['telephone'], $bodyArray['email'], $bodyArray['password']);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
