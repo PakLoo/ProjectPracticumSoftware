@@ -8,22 +8,20 @@ use Psr\Http\Message\MessageInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $app->post('/employees/empTextInsert', 
+    $app->post('/SingUp', 
             function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
-    $body = $request->getBody();
-    $bodyArray = json_decode($body, true);
+    $body = $request->getParsedBody();
     $stmt = $conn->prepare("insert into members " . "(titlename, firstName, lastName, 
                             telephone, email , password)".
                             " values (?,?,?,?,?,?,?)");
     $stmt->bind_param("ssssss",
-                        $bodyArray['titlename'], $bodyArray['firstName'], $bodyArray['lastName'],
-                        $bodyArray['telephone'], $bodyArray['email'], $bodyArray['password']);
+                        $body['titlename'], $body['firstName'], $body['lastName'],
+                        $body['telephone'], $body['email'], $body['password']);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
     return $response->withHeader('Content-Type', 'application/json');
-
 
     });
 
