@@ -94,7 +94,7 @@ $app->get('/memberCheckBoothDetail', function (Request $request, Response $respo
 });
 
 //member update firstname lastname telephone password by email search
-$app->post("/users/userUpdate",function (Request $request,   Response $response,array $args) {
+$app->post("/memberUpdate",function (Request $request,   Response $response,array $args) {
     $body= $request->getParsedBody();
     $conn = $GLOBALS["conn"];
     $stmt = $conn->prepare("UPDATE users set firstname = ? ,lastname = ? ,telephone = ? ,password = ? where email = ?");
