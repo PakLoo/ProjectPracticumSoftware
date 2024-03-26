@@ -27,7 +27,7 @@ return $response->withHeader('Content-Type', 'application/json');
 
 $app->get('/generalZoneBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select ZoneID, ZoneName, ZoneDetail, count*(BoothID)as 'BoothID' FROM Zone";
+        $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothID FROM Zone";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
