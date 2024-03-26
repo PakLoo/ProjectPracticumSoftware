@@ -8,7 +8,7 @@ use Psr\Http\Message\MessageInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 
-$app->post('/SignUp', 
+$app->post('/VisitorSignUp', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
@@ -28,7 +28,7 @@ echo "Sign Up Success";
 
 $app->get('/VisitorZoneBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothID FROM Zone";
+        $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothInZone FROM Zone Group by ZoneID";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
@@ -43,7 +43,7 @@ $app->get('/VisitorZoneBooth', function (Request $request, Response $response, a
 
 $app->get('/VisitorDetailBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
+        $sql = "select * FROM Booth";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
