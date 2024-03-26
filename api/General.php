@@ -42,7 +42,7 @@ $app->get('/generalZoneBooth', function (Request $request, Response $response, a
 
 $app->get('/generalDetailBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select BoothID, BoothName, BoothSize, BoothStatus FROM Booth";
+        $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
