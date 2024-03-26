@@ -61,7 +61,7 @@ $app->post("/userLogin",function (Request $request,Response $response,array $arg
     }
 });
 
-$app->get('/generalZoneBooth', function (Request $request, Response $response, array $args){
+$app->get('/ZoneBooth', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothID FROM Zone";
     $result = $conn->query($sql);
@@ -75,7 +75,7 @@ $app->get('/generalZoneBooth', function (Request $request, Response $response, a
 
 });
 
-$app->get('/generalDetailBooth', function (Request $request, Response $response, array $args){
+$app->get('/DetailBooth', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
     $result = $conn->query($sql);
