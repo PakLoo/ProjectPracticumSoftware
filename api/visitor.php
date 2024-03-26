@@ -8,7 +8,7 @@ use Psr\Http\Message\MessageInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 
-$app->post('/general', 
+$app->post('/SignUp', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
@@ -22,10 +22,11 @@ $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
+echo "Sign Up Success";
 
 });
 
-$app->get('/generalZoneBooth', function (Request $request, Response $response, array $args){
+$app->get('/VisitorZoneBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
         $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothID FROM Zone";
         $result = $conn->query($sql);
@@ -40,7 +41,7 @@ $app->get('/generalZoneBooth', function (Request $request, Response $response, a
     
 });
 
-$app->get('/generalDetailBooth', function (Request $request, Response $response, array $args){
+$app->get('/VisitorDetailBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
         $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
         $result = $conn->query($sql);
