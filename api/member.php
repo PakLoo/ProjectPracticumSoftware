@@ -73,7 +73,6 @@ $app->get('/generalZoneBooth', function (Request $request, Response $response, a
     $response->getBody()->write($json);
     return $response->withHeader('Content-Type', 'application/json');
 
-
 });
 
 $app->get('/generalDetailBooth', function (Request $request, Response $response, array $args){
@@ -87,7 +86,6 @@ $app->get('/generalDetailBooth', function (Request $request, Response $response,
     $json = json_encode($data);
     $response->getBody()->write($json);
     return $response->withHeader('Content-Type', 'application/json');
-
 
 });
 
