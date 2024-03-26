@@ -24,7 +24,6 @@ $app->get('/members', function (Request $request, Response $response, array $arg
 });
 
 
-<<<<<<< HEAD
 //14
 $app->post('/EventInsert', 
         function (Request $request, Response $response, array $args){
@@ -34,53 +33,10 @@ $stmt = $conn->prepare("insert into event " . "(EventID,EventName, EventDate, Ev
                         " values (?,?,?,?)");
 $stmt->bind_param("isss",
                     $body['EventID'],$body['EventName'], $body['EventDate'], $body['EventDateEnd']);
-=======
-//ลบข้อมูลโซน เฉพาะรายการของชื่อโซน
-$app->post("/DeleteZone",function (Request $request,   Response $response,array $args) {
-    $body= $request->getParsedBody();
-    $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("DELETE FROM Zone WHERE ZoneName=?");
-    $stmt->bind_param("s",$body['ZoneName']);
-    $stmt->execute();
-    $result = $stmt->affected_rows;
-    $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
-});
-
-
-//ลบข้อมูลบูธ เฉพาะรายการของชื่อบูธ
-$app->post("/DeleteBooth",function (Request $request,   Response $response,array $args) {
-    $body= $request->getParsedBody();
-    $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("DELETE FROM Zone WHERE BoothName=?");
-    $stmt->bind_param("s",$body['BoothName']);
-    $stmt->execute();
-    $result = $stmt->affected_rows;
-    $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
-});
-
-
-//เพิ่มข้อมูลบูธ
-$app->post('/InsertDetailBooth', 
-        function (Request $request, Response $response, array $args){
-$conn = $GLOBALS['conn'];
-$body = $request->getParsedBody();
-$stmt = $conn->prepare("INSERT INTO members " . "(BoothID , BoothName, BoothSize)".
-                        " values (?,?,?)".
-                        "INSERT INTO Booking " . "(BoothSelling)".
-                        " values (?)".
-                        "INSERT INTO Zone " . "(ZoneID)".
-                        " values (?);");
-$stmt->bind_param("isssi",
-                    $body['BoothID'], $body['BoothName'], $body['BoothSize'],
-                    $body['BoothSelling'], $body['ZoneID']);
->>>>>>> 71e23a0691502547bfbb9e4c70f8e1252e4429e5
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
-<<<<<<< HEAD
 echo "Insert Success";
 
 });
@@ -142,23 +98,3 @@ $app->get('/ZoneSelect', function (Request $request, Response $response, array $
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-=======
-});
-
-//แก้ไขข้อมูลบูธ
-$app->post("/EditBooth",function (Request $request,   Response $response,array $args) {
-    $body= $request->getParsedBody();
-    $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("UPDATE Booth 
-                            INNER JOIN Booking on Booking.BoothID = Booth.BoothID 
-                            INNER JOIN Zone on Zone.BoothID = Booth.BoothID 
-                            set BoothName = ? ,BoothSize = ? ,BoothSelling = ? ,ZoneID  = ? where BoothName = ?");
-    $stmt->bind_param("sssss",$body['BoothName'],$body['BoothSize'],$body['BoothSelling'],$body['ZoneID']);
-    $stmt->execute();
-    $result = $stmt->affected_rows;
-    $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
-});
-
-?>
->>>>>>> 71e23a0691502547bfbb9e4c70f8e1252e4429e5
