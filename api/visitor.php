@@ -51,6 +51,7 @@ $app->get('/VisitorDetailBooth', function (Request $request, Response $response,
         }
         $json = json_encode($data);
         $response->getBody()->write($json);
+        header("Content-type: " . $row["imageType"]);
         return $response->withHeader('Content-Type', 'application/json');
     
     
