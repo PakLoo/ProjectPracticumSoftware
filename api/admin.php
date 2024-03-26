@@ -77,7 +77,11 @@ $stmt = $conn->prepare("insert into Zone " . "(ZoneQuantity,ZoneName, ZoneDetail
                         " values (?,?,?)");
 $stmt->bind_param("sss",
                      $body['ZoneQuantity'],$body['ZoneName'], $body['ZoneDetail']);
-                
+$stmt->execute();
+$result = $stmt->affected_rows;
+$response->getBody()->write($result."");
+return $response->withHeader('Content-Type', 'application/json');
+});          
 //17
 $app->post('/ZoneUpdate', 
         function (Request $request, Response $response, array $args){
@@ -154,7 +158,6 @@ $app->get('/ZoneSelect', function (Request $request, Response $response, array $
 });
 
 
-});
 
 //แก้ไขข้อมูลบูธ
 $app->post("/EditBooth",function (Request $request,   Response $response,array $args) {
