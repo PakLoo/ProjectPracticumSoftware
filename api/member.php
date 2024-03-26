@@ -24,8 +24,8 @@ $app->get('/members', function (Request $request, Response $response, array $arg
 
 });
 
-
-$app->post("/userLogin",function (Request $request,Response $response,array $args) { 
+//members Login
+$app->post("/memberLogin",function (Request $request,Response $response,array $args) { 
     function getPasswordFromDB($conn,$email){
         $stmt = $conn->prepare("select password from members where email = ?");
         $stmt->bind_param("s",$email);
@@ -42,7 +42,7 @@ $app->post("/userLogin",function (Request $request,Response $response,array $arg
         $stmt->bind_param("s",$email);
         $stmt->execute();
         $result2 = $stmt->get_result();
-        if ($result2->num_rows >0){
+        if ($result2->num_rows > 0){
            while ($row2 = $result2->fetch_assoc()) {
             echo $row2["titlename"]." ".$row2["firstname"]." ".$row2["lastname"]." ".$row2["telephone"]." ".$row2["email"]."<br>";
            }
@@ -60,9 +60,11 @@ $app->post("/userLogin",function (Request $request,Response $response,array $arg
     }else{
         getInfo($conn,$email);
     }
+    return $response;
 });
 
-$app->get('/ZoneBooth', function (Request $request, Response $response, array $args){
+//members check BoothZone
+$app->get('/memberCheckBoothZone', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothID FROM Zone";
     $result = $conn->query($sql);
@@ -76,7 +78,8 @@ $app->get('/ZoneBooth', function (Request $request, Response $response, array $a
 
 });
 
-$app->get('/DetailBooth', function (Request $request, Response $response, array $args){
+//members check BoothDetail
+$app->get('/memberCheckBoothDetail', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
     $result = $conn->query($sql);
@@ -89,5 +92,19 @@ $app->get('/DetailBooth', function (Request $request, Response $response, array 
     return $response->withHeader('Content-Type', 'application/json');
 
 });
-//AAA
+
+//member update firstname lastname telephone password by email search
+$app->post("/memberUpdate",function (Request $request,   Response $response,array $args) {
+    $body= $request->getParsedBody();
+    $conn = $GLOBALS["conn"];
+    $stmt = $conn->prepare("UPDATE users set firstname = ? ,lastname = ? ,telephone = ? ,password = ? where email = ?");
+    $stmt->bind_param("sssss",$body['firstname'],$body['lastname'],$body['telephone'],$body['password'],$body['email']);
+    $stmt->execute();
+    $result = $stmt->affected_rows;
+    $response->getBody()->write($result."");
+    return $response->withHeader("Content - Type","application/json");
+});
+
+
+
 ?>
