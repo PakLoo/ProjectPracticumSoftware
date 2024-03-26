@@ -23,4 +23,42 @@ $app->get('/members', function (Request $request, Response $response, array $arg
 
 
 });
+
+$app->post("/userLogin",function (Request $request,Response $response,array $args) { 
+    function getPasswordFromDB($conn,$email){
+        $stmt = $conn->prepare("select password from members where email = ?");
+        $stmt->bind_param("s",$email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows == 1){
+            $row = $result->fetch_assoc();
+            return $row["password"];
+        }
+    }
+
+    function getInfo($conn,$email){
+        $stmt = $conn->prepare("select * from members where email = ?");
+        $stmt->bind_param("s",$email);
+        $stmt->execute();
+        $result2 = $stmt->get_result();
+        if ($result2->num_rows >0){
+           while ($row2 = $result2->fetch_assoc()) {
+            echo $row2["titlename"]." ".$row2["firstname"]." ".$row2["lastname"]." ".$row2["telephone"]." ".$row2["email"]."<br>";
+           }
+        }
+    }
+
+    $conn = $GLOBALS["conn"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+
+    $dbPassword = getPasswordFromDB($conn,$email);
+
+    if ($dbPassword != $password) {
+        echo 'failed';
+    }else{
+        getInfo($conn,$email);
+    }
+});
+
 ?>
