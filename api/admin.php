@@ -88,11 +88,10 @@ return $response->withHeader('Content-Type', 'application/json');
 $app->post('/ZoneUpdate', 
         function (Request $request, Response $response){
 $body = $request->getParsedBody();
-$oBN = $body['oBN'];
-$oBN = $body['oBN'];
+$oZID = $body('oZID');
 $conn = $GLOBALS['conn'];
-$stmt = $conn->prepare("UPDATE Booth INNER JOIN Zone ON Booth.ZoneId = Zone.ZoneID
-                        SET Zone.ZoneName=?, Booth.ZoneID=?  WHERE Zone.ZoneName=? and Booth.ZoneID=?" );
+$stmt = $conn->prepare("UPDATE Zone INNER JOIN Booth ON Booth.BoothID = Zone.BoothID
+                        SET Zone.ZoneName=?, Booth.ZoneID=?  WHERE Booth.ZoneID=? ");
 $stmt->bind_param("si",$body['ZoneName'],$body['ZoneID']);
 $stmt->execute();
 $result = $stmt->affected_rows;
