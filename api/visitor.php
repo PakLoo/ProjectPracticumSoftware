@@ -57,5 +57,4 @@ $app->get('/VisitorDetailBooth', function (Request $request, Response $response,
 });
 
 
-
 ?>
