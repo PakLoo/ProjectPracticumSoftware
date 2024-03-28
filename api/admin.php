@@ -58,14 +58,14 @@ $app->post('/EventUpdate',
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("UPDATE event SET EventName=?,EventDate=?,EventDateEnd=? where EventID=?" );
+$stmt = $conn->prepare("UPDATE event SET EventName=?,EventDate=?,EventDateEnd=?,EventID=? where EventID=?" );
 $stmt->bind_param("ssss",
                     $body['EventName'], $body['EventDate'], $body['EventDateEnd'], $body['EventID']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
-echo "Update Success";
+
 
 });
 
@@ -88,18 +88,19 @@ return $response->withHeader('Content-Type', 'application/json');
 $app->post('/ZoneUpdate', 
         function (Request $request, Response $response){
 $body = $request->getParsedBody();
+$oBN = $body['oBN'];
+$oBN = $body['oBN'];
 $conn = $GLOBALS['conn'];
-$oZoneName = $body['oZoneName'];
-$stmt = $conn->prepare("UPDATE Zone SET BoothIDZone=?,ZoneID=?,ZoneName=?,ZoneDetail=?,ZoneQuentity=?,Event=?,EventName=?
-                        ,EventDate=?,EventDateEnd=? WHERE ZoneName='$oZoneName'" );
-$stmt->bind_param("isssiisss",$body['BoothIDZone'],$body['ZoneID'], $body['ZoneName'], $body['ZoneDetail'], $body['ZoneQuentity']
-                    , $body['Event'], $body['EventName'], $body['EventDate'], $body['EventDateEnd']);
+$stmt = $conn->prepare("UPDATE Booth INNER JOIN Zone ON Booth.ZoneId = Zone.ZoneID
+                        SET Zone.ZoneName=?, Booth.ZoneID=?  WHERE Zone.ZoneName=? and Booth.ZoneID=?" );
+$stmt->bind_param("si",$body['ZoneName'],$body['ZoneID']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
 
 });
+
 
 //ลบข้อมูลโซน เฉพาะรายการของชื่อโซน
 $app->post("/DeleteZone",function (Request $request,   Response $response,array $args) {
@@ -173,7 +174,7 @@ $app->post('/admin/boothEdit', function (Request $request, Response $response) {
 $app->get('/admin/zoneInfo', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $sql = "SELECT zone.zoneID, zone.zoneName, zone.zoneDetail, COUNT(booth.boothID)as boothAmount FROM boothINNER JOIN zone ON booth.zoneID = zone.zoneID GROUP BY zoneID";
+    $sql = "SELECT Zone.ZoneID, Zone.ZoneName, Zone.ZoneDetail, COUNT(Booth.BoothID)as boothAmount FROM Booth INNER JOIN Zone ON Booth.ZoneID = Zone.ZoneID GROUP BY ZoneID";
     $result = $conn->Query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){

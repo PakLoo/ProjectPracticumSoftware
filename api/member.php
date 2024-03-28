@@ -65,7 +65,7 @@ $app->post("/memberLoginAndLogOut",function (Request $request,Response $response
 //members check BoothZone
 $app->get('/memberCheckBoothZone', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
-    $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothInZone FROM Zone Group by ZoneID";
+    $sql = "select ZoneID, ZoneName, ZoneDetail, count(Booth.BoothID)as Booth FROM Zone Group by ZoneID";
     $result = $conn->query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
