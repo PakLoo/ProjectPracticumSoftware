@@ -140,10 +140,10 @@ $app->post('/admin/addBooth', function (Request $request, Response $response) {
 
 });
 
-//selectZone
-$app->get('/ZoneSelect', function (Request $request, Response $response, array $args){
+//selectmembers
+$app->get('/admin/membersSelect', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
-    $sql = "select * from Zone";
+    $sql = "select firstname,lastname,telephone,email  from members";
     $result = $conn->query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
