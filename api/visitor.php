@@ -28,7 +28,7 @@ echo "Sign Up Success";
 
 $app->get('/VisitorZoneBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select ZoneID, ZoneName, ZoneDetail, count(BoothID)as BoothInZone FROM Zone Group by ZoneID";
+        $sql = "SELECT Zone.ZoneID, Zone.ZoneName, Zone.ZoneDetail, COUNT(Booth.BoothID)as BoothAmount FROM Booth INNER JOIN Zone ON Booth.ZoneID = Zone.ZoneID GROUP BY Zone.ZoneID";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
