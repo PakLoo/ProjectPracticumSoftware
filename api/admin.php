@@ -87,10 +87,10 @@ return $response->withHeader('Content-Type', 'application/json');
 //17 แก้ไขข้อมูลในโซน
 $app->post('/ZoneUpdate', 
         function (Request $request, Response $response){
-$conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
+$conn = $GLOBALS['conn'];
 $oZoneName = $body['oZoneName'];
-$stmt = $conn->prepare("UPDATE Zone SET BoothIDZone,ZoneID=?,ZoneName=?,ZoneDetail=?,ZoneQuentity=?,Event=?,EventName=?
+$stmt = $conn->prepare("UPDATE Zone SET BoothIDZone=?,ZoneID=?,ZoneName=?,ZoneDetail=?,ZoneQuentity=?,Event=?,EventName=?
                         ,EventDate=?,EventDateEnd=? WHERE ZoneName='$oZoneName'" );
 $stmt->bind_param("isssiisss",$body['BoothIDZone'],$body['ZoneID'], $body['ZoneName'], $body['ZoneDetail'], $body['ZoneQuentity']
                     , $body['Event'], $body['EventName'], $body['EventDate'], $body['EventDateEnd']);
@@ -131,8 +131,8 @@ $app->post("/DeleteBooth",function (Request $request,   Response $response,array
 $app->post('/admin/addBooth', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare("insert into booth (boothName,boothSize,product,zoneID) values (?,?,?,?) ");
-    $stmt->bind_param("ssss",  $bodyArr["boothName"], $bodyArr["boothSize"],$bodyArr['product'], $bodyArr["zoneID"]);
+    $stmt = $conn->prepare("INSERT INTO Booth (BoothName,BoothSize,BoothSelling,ZoneID) values (?,?,?,?) ");
+    $stmt->bind_param("ssss",  $bodyArr["BoothName"], $bodyArr["BoothSize"],$bodyArr['BoothSelling'], $bodyArr["ZoneID"]);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
@@ -170,7 +170,7 @@ $app->post('/admin/boothEdit', function (Request $request, Response $response) {
 });
 
 //booth in zone
-$app->get('/member/zoneInfo', function (Request $request, Response $response) {
+$app->get('/admin/zoneInfo', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
     $sql = "SELECT zone.zoneID, zone.zoneName, zone.zoneDetail, COUNT(booth.boothID)as boothAmount FROM boothINNER JOIN zone ON booth.zoneID = zone.zoneID GROUP BY zoneID";
