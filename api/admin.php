@@ -29,7 +29,7 @@ $app->post('/EventInsert',
         function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $body = $request->getParsedBody();
-    $stmt = $conn->prepare("insert into event " . "(EventID,EventName, EventDate, EventDateEnd)". 
+    $stmt = $conn->prepare("INSERT INTO event " . "(EventID,EventName, EventDate, EventDateEnd)". 
                             " values (?,?,?,?)");
     $stmt->bind_param("isss",
                         $body['EventID'],$body['EventName'], $body['EventDate'], $body['EventDateEnd']);
@@ -40,6 +40,7 @@ $app->post('/EventInsert',
 
 
 });
+
 //แสดงข้อมูล * ใน Event
 $app->get('/EventSelect', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
@@ -53,13 +54,14 @@ $app->get('/EventSelect', function (Request $request, Response $response, array 
     $response->getBody()->write($json);
     return $response->withHeader('Content-Type', 'application/json');
 });
+
 //15 แก้ไขงาน
 $app->post('/EventUpdate', 
         function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $body = $request->getParsedBody();
-    $stmt = $conn->prepare("UPDATE event SET EventName=?,EventDate=?,EventDateEnd=?,EventID=? where EventID=?" );
-    $stmt->bind_param("ssss",
+    $stmt = $conn->prepare("UPDATE event SET EventName=?,EventDate=?,EventDateEnd=? where EventID=?" );
+    $stmt->bind_param("sssi",
                         $body['EventName'], $body['EventDate'], $body['EventDateEnd'], $body['EventID']);
     $stmt->execute();
     $result = $stmt->affected_rows;
@@ -99,7 +101,7 @@ $app->post('/ZoneUpdate',function (Request $request, Response $response){
 });
 
 
-//ลบข้อมูลโซน เฉพาะรายการของชื่อโซน
+//18 ลบข้อมูลโซน เฉพาะรายการของชื่อโซน
 $app->post("/DeleteZone",function (Request $request,   Response $response,array $args) {
     $body= $request->getParsedBody();
     $conn = $GLOBALS["conn"];
@@ -112,7 +114,7 @@ $app->post("/DeleteZone",function (Request $request,   Response $response,array 
 });
 
 
-//ลบข้อมูลบูธ เฉพาะรายการของชื่อบูธ
+//21 ลบข้อมูลบูธ เฉพาะรายการของชื่อบูธ
 $app->post("/DeleteBooth",function (Request $request,   Response $response,array $args) {
     $body= $request->getParsedBody();
     $conn = $GLOBALS["conn"];
@@ -125,7 +127,7 @@ $app->post("/DeleteBooth",function (Request $request,   Response $response,array
 });
 
 
-//เพิ่มข้อมูลบูธ
+//19 เพิ่มข้อมูลบูธ
 $app->post('/admin/addBooth', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
@@ -138,7 +140,7 @@ $app->post('/admin/addBooth', function (Request $request, Response $response) {
 
 });
 
-//selectmembers
+//23 selectmembers
 $app->get('/admin/membersSelect', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
     $sql = "SELECT firstname,lastname,telephone,email  FROM members";
@@ -154,7 +156,7 @@ $app->get('/admin/membersSelect', function (Request $request, Response $response
 
 
 
-//แก้ไขข้อมูลบูธ
+//20 แก้ไขข้อมูลบูธ
 $app->post('/admin/boothEdit', function (Request $request, Response $response) {
     $body = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
