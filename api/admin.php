@@ -68,28 +68,29 @@ return $response->withHeader('Content-Type', 'application/json');
 echo "Update Success";
 
 });
+
 //16 เพิ่มขอมูลในโซน
 $app->post('/ZoneInsert', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("insert into Zone " . "(ZoneID,ZoneName,ZoneDetail)". 
-                        " values (?,?,?)");
-$stmt->bind_param("sss",
-                     $body['ZoneID'],$body['ZoneName'], $body['ZoneDetail']);
+$stmt = $conn->prepare("INSERT INTO Zone " . "(ZoneID,ZoneName,ZoneDetail,BoothIDZone,ZoneQuentity )". 
+                        " values (?,?,?,?,?)");
+$stmt->bind_param("sssii",$body['ZoneID'],$body['ZoneName'], $body['ZoneDetail'], $body['BoothIDZone'], $body['ZoneQuentity']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
+
 });          
 //17 แก้ไขข้อมูลในโซน
 $app->post('/ZoneUpdate', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("UPDATE Zone SET ZoneName=?,ZoneDetail=? where BoothID=?" );
+$stmt = $conn->prepare("UPDATE Zone SET ZoneName=?,ZoneDetail=? where BoothIDZone=?" );
 $stmt->bind_param("sss",
-                    $body['ZoneName'], $body['ZoneDetail'], $body['BoothID']);
+                    $body['ZoneName'], $body['ZoneDetail'], $body['BoothIDZone']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
