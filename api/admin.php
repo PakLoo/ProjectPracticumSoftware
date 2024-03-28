@@ -123,23 +123,18 @@ $app->post("/DeleteBooth",function (Request $request,   Response $response,array
 
 
 //เพิ่มข้อมูลบูธ
-$app->post('/InsertDetailBooth', 
-        function (Request $request, Response $response, array $args){
-$conn = $GLOBALS['conn'];
-$body = $request->getParsedBody();
-$stmt = $conn->prepare("INSERT INTO Booth " . "(BoothID , BoothName, BoothSize)" . " values (?,?,?)");
-$stmt = $conn->prepare("INSERT INTO Booking " . "(BoothSelling)" . " values (?)");
-$stmt = $conn->prepare("INSERT INTO Zone " . "(ZoneID)" . " values (?);");                        
-$stmt->bind_param("iss",$body['BoothID'], $body['BoothName'], $body['BoothSize']);
-$stmt->bind_param("s",$body['BoothSelling']);
-$stmt->bind_param("i",$body['ZoneID']);
-$stmt->execute();
-$result = $stmt->affected_rows;
-$response->getBody()->write($result."");
-return $response->withHeader('Content-Type', 'application/json');
-echo "Insert Success";
+$app->post('/admin/addBooth', function (Request $request, Response $response) {
+    $bodyArr = $request->getParsedBody();
+    $conn = $GLOBALS['conn'];
+    $stmt = $conn->prepare("insert into booth (boothName,boothSize,product,zoneID) values (?,?,?,?) ");
+    $stmt->bind_param("ssss",  $bodyArr["boothName"], $bodyArr["boothSize"],$bodyArr['product'], $bodyArr["zoneID"]);
+    $stmt->execute();
+    $result = $stmt->affected_rows;
+    $response->getBody()->write($result."");
+    return $response->withHeader("Content-Type","application/json");
 
 });
+
 //selectZone
 $app->get('/ZoneSelect', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
@@ -157,17 +152,16 @@ $app->get('/ZoneSelect', function (Request $request, Response $response, array $
 
 
 //แก้ไขข้อมูลบูธ
-$app->post("/EditBooth",function (Request $request,   Response $response,array $args) {
-    $body= $request->getParsedBody();
-    $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("UPDATE Booth 
-                            INNER JOIN Booking on Booking.BoothID = Booth.BoothID 
-                            set BoothName = ? ,BoothSize = ? ,BoothSelling = ? where BoothName = ?");
-    $stmt->bind_param("sss",$body['BoothName'],$body['BoothSize'],$body['BoothSelling']);
+$app->post('/admin/boothEdit', function (Request $request, Response $response) {
+    $body = $request->getParsedBody();
+    $conn = $GLOBALS['conn'];
+    $oBN = $body['oBN'];
+    $stmt = $conn->prepare("UPDATE Booth SET BoothName =?, BoothSize=?, BoothSelling=? where BoothName = '$oBN'");
+    $stmt->bind_param("sss", $body["BoothName"], $body["BoothSize"], $body["BoothSelling"]);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
+    return $response->withHeader("Content-Type","application/json");
 });
 
 ?>
