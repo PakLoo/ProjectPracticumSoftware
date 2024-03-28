@@ -53,7 +53,7 @@ $app->get('/EventSelect', function (Request $request, Response $response, array 
     $response->getBody()->write($json);
     return $response->withHeader('Content-Type', 'application/json');
 });
-//15
+//15 แก้ไขงาน
 $app->post('/EventUpdate', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
@@ -68,28 +68,28 @@ return $response->withHeader('Content-Type', 'application/json');
 echo "Update Success";
 
 });
-//16
+//16 เพิ่มขอมูลในโซน
 $app->post('/ZoneInsert', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("insert into Zone " . "(ZoneQuantity,ZoneName, ZoneDetail)". 
+$stmt = $conn->prepare("insert into Zone " . "(ZoneID,ZoneName,ZoneDetail)". 
                         " values (?,?,?)");
 $stmt->bind_param("sss",
-                     $body['ZoneQuantity'],$body['ZoneName'], $body['ZoneDetail']);
+                     $body['ZoneID'],$body['ZoneName'], $body['ZoneDetail']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
 });          
-//17
+//17 แก้ไขข้อมูลในโซน
 $app->post('/ZoneUpdate', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("UPDATE event SET EventName=?,EventDate=?,EventDateEnd=? where EventID=?" );
-$stmt->bind_param("ssss",
-                    $body['EventName'], $body['EventDate'], $body['EventDateEnd'], $body['EventID']);
+$stmt = $conn->prepare("UPDATE Zone SET ZoneName=? where ZoneID=?" );
+$stmt->bind_param("ss",
+                    $body['ZoneName'], $body['ZoneID']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
@@ -170,4 +170,18 @@ $app->post("/EditBooth",function (Request $request,   Response $response,array $
     return $response->withHeader("Content - Type","application/json");
 });
 
+//booth in zone
+$app->get('/member/zoneInfo', function (Request $request, Response $response) {
+    $bodyArr = $request->getParsedBody();
+    $conn = $GLOBALS['conn'];
+    $sql = "SELECT zone.zoneID, zone.zoneName, zone.zoneDetail, COUNT(booth.boothID)as boothAmount FROM boothINNER JOIN zone ON booth.zoneID = zone.zoneID GROUP BY zoneID";
+    $result = $conn->Query($sql);
+    $data = array();
+    while($row = $result->fetch_assoc()){
+        array_push($data, $row);
+    }
+    $json = json_encode($data);
+    $response->getBody()->write($json);
+    return $response->withHeader('Content-Type','application/json');
+});
 ?>
