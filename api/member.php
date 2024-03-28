@@ -96,8 +96,8 @@ $app->get('/memberCheckBoothDetail', function (Request $request, Response $respo
 $app->post("/memberUpdate",function (Request $request,   Response $response) {
     $body= $request->getParsedBody();
     $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("UPDATE members set firstname = ? ,lastname = ? ,telephone = ? , password = ? WHERE email = ?");
-    $stmt->bind_param("sssss",$body['firstname'],$body['lastname'],$body['telephone'],$body['password'],$body['email']);
+    $stmt = $conn->prepare("UPDATE members set titlename=?, firstname = ? ,lastname = ? ,telephone = ? , password = ? WHERE email = ?");
+    $stmt->bind_param("ssssss",$body['titlename'],$body['firstname'],$body['lastname'],$body['telephone'],$body['password'],$body['email']);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
