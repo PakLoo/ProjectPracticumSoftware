@@ -82,21 +82,25 @@ $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
 
-});          
+}); 
+
 //17 แก้ไขข้อมูลในโซน
 $app->post('/ZoneUpdate', 
-        function (Request $request, Response $response, array $args){
+        function (Request $request, Response $response){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("UPDATE Zone SET ZoneName=?,ZoneDetail=? where BoothIDZone=?" );
-$stmt->bind_param("sss",
-                    $body['ZoneName'], $body['ZoneDetail'], $body['BoothIDZone']);
+$oZoneName = $body['oZoneName'];
+$stmt = $conn->prepare("UPDATE Zone SET BoothIDZone,ZoneID=?,ZoneName=?,ZoneDetail=?,ZoneQuentity=?,Event=?,EventName=?
+                        ,EventDate=?,EventDateEnd=? WHERE ZoneName='$oZoneName'" );
+$stmt->bind_param("isssiisss",$body['BoothIDZone'],$body['ZoneID'], $body['ZoneName'], $body['ZoneDetail'], $body['ZoneQuentity']
+                    , $body['Event'], $body['EventName'], $body['EventDate'], $body['EventDateEnd']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
 return $response->withHeader('Content-Type', 'application/json');
 
 });
+
 //ลบข้อมูลโซน เฉพาะรายการของชื่อโซน
 $app->post("/DeleteZone",function (Request $request,   Response $response,array $args) {
     $body= $request->getParsedBody();
