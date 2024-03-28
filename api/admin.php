@@ -87,9 +87,9 @@ $app->post('/ZoneUpdate',
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("UPDATE Zone SET ZoneName=? where ZoneID=?" );
-$stmt->bind_param("ss",
-                    $body['ZoneName'], $body['ZoneID']);
+$stmt = $conn->prepare("UPDATE Zone SET ZoneName=?,ZoneDetail=? where BoothID=?" );
+$stmt->bind_param("sss",
+                    $body['ZoneName'], $body['ZoneDetail'], $body['BoothID']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
