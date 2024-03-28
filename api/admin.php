@@ -141,7 +141,7 @@ $app->post('/admin/addBooth', function (Request $request, Response $response) {
 //selectmembers
 $app->get('/admin/membersSelect', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
-    $sql = "select firstname,lastname,telephone,email  from members";
+    $sql = "SELECT firstname,lastname,telephone,email  FROM members";
     $result = $conn->query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
@@ -159,7 +159,7 @@ $app->post('/admin/boothEdit', function (Request $request, Response $response) {
     $body = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
     $oBN = $body['oBN'];
-    $stmt = $conn->prepare("UPDATE Booth SET BoothName =?, BoothSize=?, BoothSelling=? where BoothName = '$oBN'");
+    $stmt = $conn->prepare("UPDATE Booth SET BoothName =?, BoothSize=?, BoothSelling=? WHERE BoothName = '$oBN'");
     $stmt->bind_param("sss", $body["BoothName"], $body["BoothSize"], $body["BoothSelling"]);
     $stmt->execute();
     $result = $stmt->affected_rows;
