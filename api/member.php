@@ -28,7 +28,7 @@ $app->post("/memberLoginAndLogOut",function (Request $request,Response $response
         $result2 = $stmt->get_result();
         if ($result2->num_rows > 0){
            while ($row2 = $result2->fetch_assoc()) {
-            echo $row2["titlename"]." ".$row2["firstname"]." ".$row2["lastname"]." ".$row2["telephone"]." ".$row2["email"]."<br>";
+            echo $row2["id"]." ".$row2["titlename"]." ".$row2["firstname"]." ".$row2["lastname"]." ".$row2["telephone"]." ".$row2["email"]." ".$row2["password"]."<br>";
            }
         }
     }
@@ -62,10 +62,10 @@ $app->post("/memberLoginAndLogOut",function (Request $request,Response $response
     
 });
 
-//members check BoothZone
+//5 members check BoothZone
 $app->get('/memberCheckBoothZone', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
-    $sql = "select ZoneID, ZoneName, ZoneDetail, count(Booth.BoothID)as Booth FROM Zone Group by ZoneID";
+    $sql = "SELECT Zone.ZoneID, Zone.ZoneName, Zone.ZoneDetail, COUNT(Booth.BoothID)as BoothAmount FROM Booth INNER JOIN Zone ON Booth.ZoneID = Zone.ZoneID GROUP BY Zone.ZoneID";
     $result = $conn->query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
@@ -77,10 +77,10 @@ $app->get('/memberCheckBoothZone', function (Request $request, Response $respons
 
 });
 
-//members check BoothDetail
+//6 members check BoothDetail
 $app->get('/memberCheckBoothDetail', function (Request $request, Response $response, array $args){
     $conn = $GLOBALS['conn'];
-    $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
+    $sql = "SELECT BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
     $result = $conn->query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
@@ -92,16 +92,16 @@ $app->get('/memberCheckBoothDetail', function (Request $request, Response $respo
 
 });
 
-//member update firstname lastname telephone password by email search
-$app->post("/memberUpdate",function (Request $request,   Response $response,array $args) {
+//12 member update firstname lastname telephone password by email search
+$app->post("/memberUpdate",function (Request $request,   Response $response) {
     $body= $request->getParsedBody();
     $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("UPDATE members set firstname = ? ,lastname = ? ,telephone = ? ,password = ? where email = ?");
+    $stmt = $conn->prepare("UPDATE members set firstname = ? ,lastname = ? ,telephone = ? , password = ? WHERE email = ?");
     $stmt->bind_param("sssss",$body['firstname'],$body['lastname'],$body['telephone'],$body['password'],$body['email']);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
+    return $response->withHeader("Content-Type","application/json");
 });
 
 

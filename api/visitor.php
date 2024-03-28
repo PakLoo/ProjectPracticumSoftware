@@ -43,7 +43,7 @@ $app->get('/VisitorZoneBooth', function (Request $request, Response $response, a
 
 $app->get('/VisitorDetailBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
+        $sql = "SELECT BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
