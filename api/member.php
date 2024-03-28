@@ -38,10 +38,10 @@ $app->post("/memberLoginAndLogOut",function (Request $request,Response $response
     $password = $_POST["password"];
 
     $dbPassword = getPasswordFromDB($conn,$email);
+
     if ($dbPassword != $password) {
         echo 'failed';
     }else{        
-        getInfo($conn, $email);
         // เช็คว่ามี session ของการ Login อยู่หรือไม่
         session_start();
         if (isset($_SESSION['logged_in'])) {
@@ -51,6 +51,7 @@ $app->post("/memberLoginAndLogOut",function (Request $request,Response $response
             session_unset();
             session_destroy();
         } else {
+            getInfo($conn, $email);
             // ถ้ายังไม่ได้ Login ให้แสดงข้อความ Login
             echo "Login";
             // กำหนด session เป็น Login
