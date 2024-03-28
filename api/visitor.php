@@ -43,7 +43,7 @@ $app->get('/VisitorZoneBooth', function (Request $request, Response $response, a
 
 $app->get('/VisitorDetailBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
-        $sql = "select * FROM Booth";
+        $sql = "select BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
         $result = $conn->query($sql);
         $data = array();
         while($row = $result->fetch_assoc()){
@@ -51,7 +51,6 @@ $app->get('/VisitorDetailBooth', function (Request $request, Response $response,
         }
         $json = json_encode($data);
         $response->getBody()->write($json);
-        header("Content-type: " . $row["imageType"]);
         return $response->withHeader('Content-Type', 'application/json');
     
     

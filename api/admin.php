@@ -105,7 +105,7 @@ $app->post("/DeleteZone",function (Request $request,   Response $response,array 
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
+    return $response;
 });
 
 
@@ -113,12 +113,12 @@ $app->post("/DeleteZone",function (Request $request,   Response $response,array 
 $app->post("/DeleteBooth",function (Request $request,   Response $response,array $args) {
     $body= $request->getParsedBody();
     $conn = $GLOBALS["conn"];
-    $stmt = $conn->prepare("DELETE FROM Zone WHERE BoothName=?");
+    $stmt = $conn->prepare("DELETE FROM Booth WHERE BoothName=?");
     $stmt->bind_param("s",$body['BoothName']);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");
-    return $response->withHeader("Content - Type","application/json");
+    return $response;
 });
 
 
@@ -127,15 +127,12 @@ $app->post('/InsertDetailBooth',
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
 $body = $request->getParsedBody();
-$stmt = $conn->prepare("INSERT INTO members " . "(BoothID , BoothName, BoothSize)".
-                        " values (?,?,?)".
-                        "INSERT INTO Booking " . "(BoothSelling)".
-                        " values (?)".
-                        "INSERT INTO Zone " . "(ZoneID)".
-                        " values (?);");
-$stmt->bind_param("isssi",
-                    $body['BoothID'], $body['BoothName'], $body['BoothSize'],
-                    $body['BoothSelling'], $body['ZoneID']);
+$stmt = $conn->prepare("INSERT INTO Booth " . "(BoothID , BoothName, BoothSize)" . " values (?,?,?)");
+$stmt = $conn->prepare("INSERT INTO Booking " . "(BoothSelling)" . " values (?)");
+$stmt = $conn->prepare("INSERT INTO Zone " . "(ZoneID)" . " values (?);");                        
+$stmt->bind_param("iss",$body['BoothID'], $body['BoothName'], $body['BoothSize']);
+$stmt->bind_param("s",$body['BoothSelling']);
+$stmt->bind_param("i",$body['ZoneID']);
 $stmt->execute();
 $result = $stmt->affected_rows;
 $response->getBody()->write($result."");
@@ -165,9 +162,8 @@ $app->post("/EditBooth",function (Request $request,   Response $response,array $
     $conn = $GLOBALS["conn"];
     $stmt = $conn->prepare("UPDATE Booth 
                             INNER JOIN Booking on Booking.BoothID = Booth.BoothID 
-                            INNER JOIN Zone on Zone.BoothID = Booth.BoothID 
-                            set BoothName = ? ,BoothSize = ? ,BoothSelling = ? ,ZoneID  = ? where BoothName = ?");
-    $stmt->bind_param("sssss",$body['BoothName'],$body['BoothSize'],$body['BoothSelling'],$body['ZoneID']);
+                            set BoothName = ? ,BoothSize = ? ,BoothSelling = ? where BoothName = ?");
+    $stmt->bind_param("sss",$body['BoothName'],$body['BoothSize'],$body['BoothSelling']);
     $stmt->execute();
     $result = $stmt->affected_rows;
     $response->getBody()->write($result."");

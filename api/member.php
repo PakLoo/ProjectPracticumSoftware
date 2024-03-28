@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 
 //members Login
-$app->post("/memberLogin",function (Request $request,Response $response,array $args) { 
+$app->post("/memberLoginAndLogOut",function (Request $request,Response $response,array $args) { 
     function getPasswordFromDB($conn,$email){
         $stmt = $conn->prepare("select password from members where email = ?");
         $stmt->bind_param("s",$email);
@@ -38,13 +38,27 @@ $app->post("/memberLogin",function (Request $request,Response $response,array $a
     $password = $_POST["password"];
 
     $dbPassword = getPasswordFromDB($conn,$email);
-
     if ($dbPassword != $password) {
         echo 'failed';
-    }else{
-        getInfo($conn,$email);
+    }else{        
+        getInfo($conn, $email);
+        // เช็คว่ามี session ของการ Login อยู่หรือไม่
+        session_start();
+        if (isset($_SESSION['logged_in'])) {
+            // ถ้า Login อยู่แล้ว ให้แสดงข้อความ LogOut
+            echo "LogOut";
+            // ลบ session
+            session_unset();
+            session_destroy();
+        } else {
+            // ถ้ายังไม่ได้ Login ให้แสดงข้อความ Login
+            echo "Login";
+            // กำหนด session เป็น Login
+            $_SESSION['logged_in'] = true;
+        }
+        return $response;
     }
-    return $response;
+    
 });
 
 //members check BoothZone
