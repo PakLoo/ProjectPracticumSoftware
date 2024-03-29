@@ -382,39 +382,39 @@ $app->post('/book/paid', function (Request $request,  Response $response, array 
         $result = $stmt->get_result();
         if ($result->num_rows == 1){
             $row = $result->fetch_assoc();
-            return $row["organize_id"];
+            return $row["EventID"];
         }
     }
     function getStartDate2($conn,$organize_id){
-        $stmt = $conn->prepare("SELECT start_date FROM organize WHERE organize_id = ?");
+        $stmt = $conn->prepare("SELECT EventDateStart FROM event WHERE EventID = ?");
         $stmt->bind_param("s",$organize_id);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows == 1){
             $row = $result->fetch_assoc();
-            return $row["start_date"];
+            return $row["EventDateStart"];
         }
     }
     
     $conn = $GLOBALS['conn'];
     $body= $request->getParsedBody();
-    $bID = $body['booth_id'];
+    $bID = $body['BoothID'];
     $organize_id = getOr($conn,$bID);
     // $organize_id = $body['organize_id'];
     $startDate = getStartDate2($conn,$organize_id);
-    $today = $body['bookPaid'];
+    $today = $body['PaymentDate'];
     $todays = date ('Y-m-d',strtotime($today));
     $startDates = date("Y-m-d",strtotime("-5 day ",strtotime($startDate)));
 
     if( $todays < $startDates ){
-        $default_payment = ""; 
-        $payment = isset($body["payment"]) ? $body["payment"] : $default_payment;
-        $stmt = $conn->prepare('update book set book_status = "paid" , bookPaid = ? , payment = ? where booth_id = ?  ');
-        $stmt->bind_param('sss', $body['bookPaid'], $payment, $body['booth_id']) ;
+        // $default_payment = ""; 
+        // $payment = isset($body["payment"]) ? $body["payment"] : $default_payment;
+        $stmt = $conn->prepare('UPDATE Booking SET BookStatus = "paid" , PaymentDate = ? WHERE BoothID = ?  ');
+        $stmt->bind_param('ss', $body['PaymentDate'], $body['BoothID']) ;
         $stmt->execute();
-        $bID = $body['booth_id'];
+        $bID = $body['BoothID'];
         function setCurrent2($conn,$bID){
-            $stmt = $conn->prepare("UPDATE booth SET current_status = 'checking' , book_status = 'paid'  WHERE booth_id = ?");
+            $stmt = $conn->prepare("UPDATE Booth SET BoothStatus = 'checking' , BookStatus = 'paid'  WHERE BoothID = ?");
             $stmt->bind_param("s",$bID);
             $stmt->execute();
         }
@@ -422,7 +422,7 @@ $app->post('/book/paid', function (Request $request,  Response $response, array 
     }else{
         echo 'You can not paid Bill payment';
         function setCurrent2($conn,$bID){
-            $stmt = $conn->prepare("UPDATE booth SET booth_name = '', product = '', userID = '',organize_id = '' , current_status = 'empty' , book_status = 'not paid'  WHERE booth_id = ?");
+            $stmt = $conn->prepare("UPDATE Booth SET BoothName = '', Product = '', id = '',EventID = '' , BoothStatus = 'empty' , BookStatus = 'not paid'  WHERE BoothID = ?");
             $stmt->bind_param("s",$bID);
             $stmt->execute();
         }
@@ -432,12 +432,12 @@ $app->post('/book/paid', function (Request $request,  Response $response, array 
     return $response;
 });     
 
-
-$app ->post('/book/cancleBook', function (Request $request, Response $response,  array $args) {
+// 11
+$app ->post('/book/cancelBook', function (Request $request, Response $response,  array $args) {
         $conn = $GLOBALS['conn'];
         $body= $request->getParsedBody();
-        $bID = $body['booth_id'];
-        $stmt = $conn->prepare("UPDATE booth SET product ='',booth_name = '',current_status = 'empty' , book_status = 'cancle' ,userId='',organize_id = ''  WHERE booth_id = ?");
+        $bID = $body['BoothID'];
+        $stmt = $conn->prepare("UPDATE Booth SET Product ='',BoothName = '',BoothStatus = 'empty' , BookStatus = 'cancle' ,id='',EventID = ''  WHERE BoothID = ?");
         $stmt->bind_param("s",$bID);
         $stmt->execute();
         return $response->withHeader('Content-Type', 'application/json');
