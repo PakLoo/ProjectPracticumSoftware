@@ -159,33 +159,33 @@ $app->post("/member/booking", function (Request $request, Response $response, ar
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
     
-    $stmt2 = $conn->prepare("SELECT bookingStatus FROM booking WHERE boothID = ?");
-    $stmt2->bind_param("i", $bodyArr["boothID"]);
+    $stmt2 = $conn->prepare("SELECT BookStatus FROM Booking WHERE BoothID = ?");
+    $stmt2->bind_param("i", $bodyArr["BoothID"]);
     $stmt2->execute();
     $stmt2->store_result();
-    $stmt2->bind_result($bookingStatus);
+    $stmt2->bind_result($BookStatus);
     $stmt2->fetch();
     
-    if ($bookingStatus == "อยู่ระหว่างตรวจสอบ" || $bookingStatus == "อนุมัติแล้ว" || $bookingStatus == "ชำระเงิน") {
+    if ($BookStatus == "อยู่ระหว่างตรวจสอบ" || $BookStatus == "อนุมัติแล้ว" || $BookStatus == "ชำระเงิน") {
         $response->getBody()->write(json_encode(["message" => "บูธถูกจองแล้ว"]));
         return $response->withHeader("Content-Type", "application/json");
     }
-    $stmt = $conn->prepare("SELECT count(userID) AS num_bookings FROM booking WHERE userID = ?");
-    $stmt->bind_param("i", $bodyArr["userID"]);
+    $stmt = $conn->prepare("SELECT count(id) AS num_bookings FROM Booking WHERE id = ?");
+    $stmt->bind_param("i", $bodyArr["id"]);
     $stmt->execute();
     $stmt->store_result();
     $stmt->bind_result($num_bookings);
     $stmt->fetch();
     if ($num_bookings <4){
-        $stmt = $conn->prepare("INSERT INTO booking (boothID, product, userID, eventID, bookingStatus, paymentDate) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isiiss", $bodyArr["boothID"], $bodyArr["product"], $bodyArr["userID"], $bodyArr["eventID"], $bookingStatus, $paymentDate);
-        $bookingStatus = "อยู่ระหว่างตรวจสอบ";
+        $stmt = $conn->prepare("INSERT INTO Booking (BoothID, Product, id, EventID, BookStatus, PaymentDate) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isiiss", $bodyArr["BoothID"], $bodyArr["Product"], $bodyArr["id"], $bodyArr["EventID"], $BookStatus, $PaymentDate);
+        $BookStatus = "อยู่ระหว่างตรวจสอบ";
         $paymentDate = "0000-00-00";
         $stmt->execute();
         $result = $stmt->affected_rows;
 
-        $stmt3 = $conn->prepare("UPDATE booth SET boothStatus=? WHERE boothID=?");
-        $stmt3->bind_param("si", $boothStatus, $bodyArr["boothID"]);
+        $stmt3 = $conn->prepare("UPDATE Booth SET BoothStatus=? WHERE BoothID=?");
+        $stmt3->bind_param("si", $boothStatus, $bodyArr["BoothID"]);
         $boothStatus = "อยู่ระหว่างตรวจสอบ";
         $stmt3->execute();
         if ($result > 0) {
@@ -220,8 +220,8 @@ $app->get('/admin/membersSelect', function (Request $request, Response $response
 $app->get('/admin/memberWhoPaid', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $sql = "select concat(titleName, firstName)as firstName, lastName, telephone, booth.boothName, zone.zoneName from booking inner join user on booking.userID = user.userID 
-            inner join booth on booking.boothID = booth.boothID inner join zone on zone.zoneID = booth.zoneID and bookingStatus = 'ชำระเงิน'";
+    $sql = "SELECT concat(titlename, firstname)as firstname, lastname, telephone, Booth.BoothName, Zone.ZoneName from Booking inner join members on Booking.id = members.id  
+            inner join Booth on Booking.BoothID = Booth.BoothID inner join Zone on Zone.ZoneID = Booth.ZoneID and BoothStatus = 'ชำระเงิน'";
     $result = $conn->Query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
@@ -237,8 +237,8 @@ $app->get('/admin/memberWhoPaid', function (Request $request, Response $response
 $app->get('/admin/memberBoothInfo', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $sql = "select concat(titleName, firstName)as firstName, lastName, telephone, booth.boothName, zone.zoneName from booking inner join user on booking.userID = user.userID 
-            inner join booth on booking.boothID = booth.boothID inner join zone on zone.zoneID = booth.zoneID and boothStatus  = 'อยู่ระหว่างตรวจสอบ'";
+    $sql = "SELECT concat(titlename, firstname)as firstname, lastname, telephone, Booth.BoothName, Zone.ZoneName from Booking inner join members on Booking.id = members.id 
+            inner join Booth on Booking.BoothID = Booth.BoothID inner join Zone on Zone.ZoneID = Booth.ZoneID and BoothStatus  = 'อยู่ระหว่างตรวจสอบ'";
     $result = $conn->Query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
@@ -249,12 +249,11 @@ $app->get('/admin/memberBoothInfo', function (Request $request, Response $respon
     return $response->withHeader('Content-Type','application/json');
 });
 
-//27
+//27 24
 $app->get('/admin/memberBoothBook', function (Request $request, Response $response) {
-    $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $sql = "select concat(titleName, firstName)as firstName, lastName, zone.zoneName, booth.boothPrice , booth.boothName, booth.boothStatus from booking inner join user on booking.userID = user.userID 
-            inner join booth on booking.boothID = booth.boothID inner join zone on zone.zoneID = booth.zoneID and (boothStatus = 'จองแล้ว' or boothStatus = 'อยู่ระหว่างตรวจสอบ')";
+    $sql = "SELECT concat(titlename, firstname)as firstname, lastname, Zone.ZoneName, Booth.BoothPrice , Booth.BoothName, Booth.BoothStatus from Booking inner join members on Booking.id = members.id 
+            inner join Booth on Booking.BoothID = Booth.BoothID inner join Zone on Zone.ZoneID = Booth.ZoneID and (BoothStatus = 'จองแล้ว' or BoothStatus = 'อยู่ระหว่างตรวจสอบ')";
     $result = $conn->Query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
