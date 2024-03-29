@@ -185,22 +185,22 @@ $app->get('/admin/zoneInfo', function (Request $request, Response $response) {
 });
 
 
-//bbbb
+// 7 bbbb
 $app->post('/booking/checkbook', function (Request $request, Response $response, array $args) {
 
-    $usd = $_POST['userID'];
+    $usd = $_POST['id'];
     $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare(" SELECT * FROM booth WHERE id = ? ; ");
+    $stmt = $conn->prepare(" SELECT * FROM Booth WHERE id = ? ; ");
     $stmt->bind_param("s", $usd);
     $stmt->execute();
     $result = $stmt->get_result();
     $data = array();
 
     while ($row = $result -> fetch_assoc()) {
-        echo $row['BoothName'].' '.$row['BoothSize'].' '.$row['product'].' '.$row['zone_id'].' '.$row['price'].' '.$row['current_status'].' '.$row['userID'].' '.$row['book_status'].' '.$row['organize_id'].'<br>';
+        echo $row['BoothName'].' '.$row['BoothSize'].' '.$row['Product'].' '.$row['ZoneID'].' '.$row['BoothPrice'].' '.$row['BoothStatus'].' '.$row['id'].' '.$row['BookStatus'].'<br>';
     }
     function selectBooth($conn,$response){
-        $sql = "select * from booth";
+        $sql = "select * from Booth";
         $result = $conn ->query($sql);
         $data=array();
         while ($row = $result -> fetch_assoc()) {
@@ -215,6 +215,7 @@ $app->post('/booking/checkbook', function (Request $request, Response $response,
     }
     /* rowc ก็คือการนับจำนวนแถวรึอะไรสักอย่าง- */
     $rowc = mysqli_num_rows($result);
+    return $response;
     if (($rowc > -1) and ($rowc < 4)){
         echo "you can book booth"."<br>";
         // $sql = ("SELECT * FROM booth where userId=$usd");
@@ -252,15 +253,15 @@ $app->post('/booking/checkbook', function (Request $request, Response $response,
         // $response->getBody()->write($json);
         return $response;
     }
-
+    
     // return $response->withHeader('Content-Type', 'application/json');
 });
 
 /* insert into booth (datebook, datepaid, booth_id, price, pathslip, book_status, product, userID, organize_id) ต้องมี 9ตัวนี้*/
-$app->post('/boothselect', function (Request $request, Response $response, array $args) {
+$app->post('/BoothSelect', function (Request $request, Response $response, array $args) {
     
     function getPrice($conn,$bID){
-        $stmt = $conn->prepare("select price from booth where booth_id = ?");
+        $stmt = $conn->prepare("SELECT BoothPrice FROM Booth WHERE BoothID = ?");
         $stmt->bind_param("s",$bID);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -270,7 +271,7 @@ $app->post('/boothselect', function (Request $request, Response $response, array
         }
     }        
     function getStartDate($conn,$organize_id){
-        $stmt = $conn->prepare("select start_date from organize where organize_id = ?");
+        $stmt = $conn->prepare("SELECT EventDateStart FROM Event WHERE EventID = ?");
         $stmt->bind_param("s",$organize_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -281,7 +282,7 @@ $app->post('/boothselect', function (Request $request, Response $response, array
     }
 
     function checkRow($conn,$usd){
-        $stmt = $conn->prepare(" select userId from booth where userId = ? ; ");
+        $stmt = $conn->prepare(" SELECT id FROM Booth WHERE id = ? ; ");
         $stmt->bind_param("s", $usd);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -303,7 +304,7 @@ $app->post('/boothselect', function (Request $request, Response $response, array
     $todays = date ('Y-m-d',strtotime($today));
     $startDates = date("Y-m-d",strtotime("-5 day ",strtotime($startDate)));//21/3/2567 -> 16/3/2567
     
-    $bID = $body['booth_id'];
+    $bID = $body['BoothID'];
 
     $rowCheck = checkRow($conn,$usd);
     
