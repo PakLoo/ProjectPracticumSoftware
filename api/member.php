@@ -165,53 +165,6 @@ $app->post("/member/check", function (Request $request, Response $response, arra
     return $response;
 });
 
-//9
-$app->post("/member/booking", function (Request $request, Response $response, array $args) {
-    $bodyArr = $request->getParsedBody();
-    $conn = $GLOBALS['conn'];
-    
-    $stmt2 = $conn->prepare("SELECT bookingStatus FROM booking WHERE boothID = ?");
-    $stmt2->bind_param("i", $bodyArr["boothID"]);
-    $stmt2->execute();
-    $stmt2->store_result();
-    $stmt2->bind_result($bookingStatus);
-    $stmt2->fetch();
-    
-    if ($bookingStatus == "อยู่ระหว่างตรวจสอบ" || $bookingStatus == "อนุมัติแล้ว" || $bookingStatus == "ชำระเงิน") {
-        $response->getBody()->write(json_encode(["message" => "บูธถูกจองแล้ว"]));
-        return $response->withHeader("Content-Type", "application/json");
-    }
-    $stmt = $conn->prepare("SELECT count(userID) AS num_bookings FROM booking WHERE userID = ?");
-    $stmt->bind_param("i", $bodyArr["userID"]);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($num_bookings);
-    $stmt->fetch();
-    if ($num_bookings <4){
-        $stmt = $conn->prepare("INSERT INTO booking (boothID, product, userID, eventID, bookingStatus, paymentDate) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isiiss", $bodyArr["boothID"], $bodyArr["product"], $bodyArr["userID"], $bodyArr["eventID"], $bookingStatus, $paymentDate);
-        $bookingStatus = "อยู่ระหว่างตรวจสอบ";
-        $paymentDate = "0000-00-00";
-        $stmt->execute();
-        $result = $stmt->affected_rows;
-
-        $stmt3 = $conn->prepare("UPDATE booth SET boothStatus=? WHERE boothID=?");
-        $stmt3->bind_param("si", $boothStatus, $bodyArr["boothID"]);
-        $boothStatus = "อยู่ระหว่างตรวจสอบ";
-        $stmt3->execute();
-        if ($result > 0) {
-            $response->getBody()->write(json_encode(["message" => "จองสำเร็จ"]));
-        } else {
-            $response->getBody()->write(json_encode(["message" => "เกิดข้อผิดพลาดในการจอง"]));
-        }
-        
-        return $response->withHeader("Content-Type", "application/json");
-    }
-    else{
-        echo "คุณไม่สามารถจองบูธได้อีกแล้ว";
-    }
-    return $response;
-});
 
 //10
 $app->post("/member/paid", function (Request $request, Response $response, array $args) {
