@@ -23,6 +23,20 @@ $app->get('/members', function (Request $request, Response $response, array $arg
 
 });
 
+//แสดงข้อมูล * ใน Event
+$app->get('/EventSelect', function (Request $request, Response $response, array $args){
+    $conn = $GLOBALS['conn'];
+    $sql = "select * from event";
+    $result = $conn->query($sql);
+    $data = array();
+    while($row = $result->fetch_assoc()){
+        array_push($data, $row);
+    }
+    $json = json_encode($data);
+    $response->getBody()->write($json);
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
 
 //14
 $app->post('/EventInsert', 
@@ -41,19 +55,6 @@ $app->post('/EventInsert',
 
 });
 
-//แสดงข้อมูล * ใน Event
-$app->get('/EventSelect', function (Request $request, Response $response, array $args){
-    $conn = $GLOBALS['conn'];
-    $sql = "select * from event";
-    $result = $conn->query($sql);
-    $data = array();
-    while($row = $result->fetch_assoc()){
-        array_push($data, $row);
-    }
-    $json = json_encode($data);
-    $response->getBody()->write($json);
-    return $response->withHeader('Content-Type', 'application/json');
-});
 
 //15 แก้ไขงาน
 $app->post('/EventUpdate', 
@@ -114,6 +115,33 @@ $app->post("/DeleteZone",function (Request $request,   Response $response,array 
 });
 
 
+//19 เพิ่มข้อมูลบูธ
+$app->post('/admin/addBooth', function (Request $request, Response $response) {
+    $bodyArr = $request->getParsedBody();
+    $conn = $GLOBALS['conn'];
+    $stmt = $conn->prepare("INSERT INTO Booth (BoothName,BoothSize,BoothSelling,ZoneID) values (?,?,?,?) ");
+    $stmt->bind_param("ssss",  $bodyArr["BoothName"], $bodyArr["BoothSize"],$bodyArr['BoothSelling'], $bodyArr["ZoneID"]);
+    $stmt->execute();
+    $result = $stmt->affected_rows;
+    $response->getBody()->write($result."");
+    return $response->withHeader("Content-Type","application/json");
+
+});
+
+
+//20 แก้ไขข้อมูลบูธ
+$app->post('/admin/boothEdit', function (Request $request, Response $response) {
+    $body = $request->getParsedBody();
+    $conn = $GLOBALS['conn'];
+    $oBN = $body['oBN'];
+    $stmt = $conn->prepare("UPDATE Booth SET BoothID=?, BoothName =?, BoothSize=?, Product=? WHERE BoothName = '$oBN'");
+    $stmt->bind_param("isss", $body["BoothID"],$body["BoothName"], $body["BoothSize"], $body["Product"]);
+    $stmt->execute();
+    $result = $stmt->affected_rows;
+    $response->getBody()->write($result."");
+    return $response->withHeader("Content-Type","application/json");
+});
+
 //21 ลบข้อมูลบูธ เฉพาะรายการของชื่อบูธ
 $app->post("/DeleteBooth",function (Request $request,   Response $response,array $args) {
     $body= $request->getParsedBody();
@@ -127,18 +155,6 @@ $app->post("/DeleteBooth",function (Request $request,   Response $response,array
 });
 
 
-//19 เพิ่มข้อมูลบูธ
-$app->post('/admin/addBooth', function (Request $request, Response $response) {
-    $bodyArr = $request->getParsedBody();
-    $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare("INSERT INTO Booth (BoothName,BoothSize,BoothSelling,ZoneID) values (?,?,?,?) ");
-    $stmt->bind_param("ssss",  $bodyArr["BoothName"], $bodyArr["BoothSize"],$bodyArr['BoothSelling'], $bodyArr["ZoneID"]);
-    $stmt->execute();
-    $result = $stmt->affected_rows;
-    $response->getBody()->write($result."");
-    return $response->withHeader("Content-Type","application/json");
-
-});
 
 //23 selectmembers
 $app->get('/admin/membersSelect', function (Request $request, Response $response, array $args){
@@ -154,20 +170,6 @@ $app->get('/admin/membersSelect', function (Request $request, Response $response
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-
-
-//20 แก้ไขข้อมูลบูธ
-$app->post('/admin/boothEdit', function (Request $request, Response $response) {
-    $body = $request->getParsedBody();
-    $conn = $GLOBALS['conn'];
-    $oBN = $body['oBN'];
-    $stmt = $conn->prepare("UPDATE Booth SET BoothID=?, BoothName =?, BoothSize=?, Product=? WHERE BoothName = '$oBN'");
-    $stmt->bind_param("isss", $body["BoothID"],$body["BoothName"], $body["BoothSize"], $body["Product"]);
-    $stmt->execute();
-    $result = $stmt->affected_rows;
-    $response->getBody()->write($result."");
-    return $response->withHeader("Content-Type","application/json");
-});
 
 //booth in zone
 $app->get('/admin/zoneInfo', function (Request $request, Response $response) {
@@ -185,261 +187,4 @@ $app->get('/admin/zoneInfo', function (Request $request, Response $response) {
 });
 
 
-// 7 bbbb
-$app->post('/booking/checkbook', function (Request $request, Response $response, array $args) {
-
-    $usd = $_POST['id'];
-    $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare(" SELECT * FROM Booth WHERE id = ? ; ");
-    $stmt->bind_param("s", $usd);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $data = array();
-
-    while ($row = $result -> fetch_assoc()) {
-        echo $row['BoothName'].' '.$row['BoothSize'].' '.$row['Product'].' '.$row['ZoneID'].' '.$row['BoothPrice'].' '.$row['BoothStatus'].' '.$row['id'].' '.$row['BookStatus'].'<br>';
-    }
-    function selectBooth($conn,$response){
-        $sql = "select * from Booth";
-        $result = $conn ->query($sql);
-        $data=array();
-        while ($row = $result -> fetch_assoc()) {
-            array_push($data,$row);
-        }
-        $json = json_encode($data);
-        $response->getBody()->write($json);
-    }
-
-    while ($row = $result->fetch_assoc()) {
-        array_push($data, $row);
-    }
-    /* rowc ก็คือการนับจำนวนแถวรึอะไรสักอย่าง- */
-    $rowc = mysqli_num_rows($result);
-    return $response;
-    if (($rowc > -1) and ($rowc < 4)){
-        echo "you can book booth"."<br>";
-        // $sql = ("SELECT * FROM booth where userId=$usd");
-        // $result = $conn->query($sql);
-        // $data2 = array();
-        // while($row = $result->fetch_assoc()) {
-        // array_push($data2, $row);
-        // }
-        // $json = json_encode($data2);
-        // $response->getBody()->write($json." ");
-
-
-        selectBooth($conn,$response);
-        return $response;
-    }elseif($rowc > 3){
-        echo 'you have limit book';
-        // $sql = ("SELECT * FROM booth where userId=$usd");
-        // $result = $conn->query($sql);
-        // $data2 = array();
-        // while($row = $result->fetch_assoc()) {
-        // array_push($data2, $row);
-        // }
-        // $json = json_encode($data2);
-        // $response->getBody()->write($json.'');
-        return $response;
-    }else{
-        echo 'fail';
-        // $sql = ("SELECT * FROM booth where userId=$usd");
-        // $result = $conn->query($sql);
-        // $data2 = array();
-        // while($row = $result->fetch_assoc()) {
-        // array_push($data2, $row);
-        // }
-        // $json = json_encode($data2);
-        // $response->getBody()->write($json);
-        return $response;
-    }
-    
-    // return $response->withHeader('Content-Type', 'application/json');
-});
-
-//
-/* insert into booth (datebook, datepaid, booth_id, price, pathslip, book_status, product, userID, organize_id) ต้องมี 9ตัวนี้*/
-$app->post('/BoothSelect', function (Request $request, Response $response, array $args) {
-    
-    function getPrice($conn,$bID){
-        $stmt = $conn->prepare("SELECT BoothPrice FROM Booth WHERE BoothID = ?");
-        $stmt->bind_param("s",$bID);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1){
-            $row = $result->fetch_assoc();
-            return $row["BoothPrice"];
-        }
-    }
-      
-    function getStartDate($conn,$organize_id){
-        $stmt = $conn->prepare("SELECT EventDateStart FROM event WHERE EventID = ?");
-        $stmt->bind_param("s",$organize_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1){
-            $row = $result->fetch_assoc();
-            return $row["EventDateStart"];
-        }
-    }
-
-    function checkRow($conn,$usd){
-        $stmt = $conn->prepare(" SELECT id FROM Booth WHERE id = ? ; ");
-        $stmt->bind_param("s", $usd);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = array();
-        while ($row = $result->fetch_assoc()) {
-            array_push($data, $row);
-        }
-        /* rowc ก็คือการนับจำนวนแถวรึอะไรสักอย่าง- */
-        $rowc = mysqli_num_rows($result);
-        return $rowc;
-    }
-
-    $conn = $GLOBALS['conn'];
-    $body= $request->getParsedBody();
-    $organize_id = $body['EventID'];
-    $usd = $body['id'];
-    $startDate = getStartDate($conn,$organize_id);
-    $today = $body['BookingDate'];
-    $todays = date ('Y-m-d',strtotime($today));
-    $startDates = date("Y-m-d",strtotime("-5 day ",strtotime($startDate)));//21/3/2567 -> 16/3/2567
-    
-    $bID = $body['BoothID'];
-
-    $rowCheck = checkRow($conn,$usd);
-    
-    function checkEmpty($conn,$bID){
-        $stmt = $conn->prepare("SELECT BoothStatus FROM Booth WHERE BoothID = ?");
-        $stmt->bind_param("s",$bID);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1){
-            $row = $result->fetch_assoc();
-            return $row["BoothStatus"];
-        }
-    }
-
-    $checkEmpty = checkEmpty($conn,$bID);
-    
-
-    
-    if ($rowCheck<4){
-        if ($checkEmpty == "empty"){
-            if($todays < $startDates){
-                $conn = $GLOBALS['conn'];
-                $body= $request->getParsedBody();
-                $bID = $body['BoothID'];
-                $product = $body['Product'];
-                $orID = $body['EventID'];
-                $bName = $body['BoothName'];
-                $price = getPrice($conn,$bID);
-                $stmt = $conn->prepare(" INSERT INTO Booking (BookingDate, PaymentDate, BoothID, BoothPrice, BookStatus, Product, id, EventID) values (?,?,?,?,'book',?,?,?) ");    
-                $stmt->bind_param("ssissis",  $body['BookingDate'],$body['PaymentDate'] , $body['BoothID'], $price, $body['Product'], $body['id'], $body['EventID']);
-                $stmt->execute();
-
-                function setCurrent($conn,$bName,$usd,$product,$orID,$bID){
-                    $stmt = $conn->prepare("UPDATE Booth SET BoothName=? ,BoothStatus = 'checking' , BoothStatus = 'waiting for paid' ,Product = ? ,id = ? , EventID = ? WHERE BoothID = ?");
-                    $stmt->bind_param("ssiii",$bName,$product,$usd,$orID,$bID);
-                    $stmt->execute();
-                }
-
-                setCurrent($conn,$bName,$usd,$product,$orID,$bID);
-            }else{
-                $conn = $GLOBALS['conn'];
-                $body= $request->getParsedBody();
-                $bID = $body['BoothID'];
-                $product = $body['Product'];
-                $bName = $body['BoothName'];
-                $oID = $body['EventID'];
-                $price = getPrice($conn,$bID);
-                $stmt = $conn->prepare(" INSERT INTO Booking (BookingDate, PaymentDate, BoothID, BoothPrice, BookStatus, Product, id, EventID) values (?,?,?,?,'book',?,?,?) ");    
-                $stmt->bind_param("ssissis",  $body['BookingDate'],$body['PaymentDate'] , $body['BoothID'], $price, $body['Product'], $body['id'], $body['EventID']);
-                $stmt->execute();
-                function setCurrent3($conn,$bName,$product,$usd,$bID,$oID){
-                    $stmt = $conn->prepare("UPDATE Booth SET BoothName=? ,BoothStatus = 'checking' , BoothStatus = 'waiting for paid' ,Product = ? ,id = ? , EventID = ? WHERE BoothID = ?");
-                    $stmt->bind_param("ssiii",$bName,$product,$usd,$oID,$bID);
-                    $stmt->execute();
-                }
-                setCurrent3($conn,$bName,$product,$usd,$bID,$oID);
-            }
-        }else{
-            
-            echo 'you can not Booking this Booth';
-        }
-    }else{
-        echo "you have limit Book";
-    };
-    return $response;
-});
-
-$app->post('/book/paid', function (Request $request,  Response $response, array $args) { 
-    function getOr($conn,$bID){
-        $stmt = $conn->prepare("SELECT EventID FROM Booth WHERE BoothID = ?");
-        $stmt->bind_param("s",$bID);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1){
-            $row = $result->fetch_assoc();
-            return $row["EventID"];
-        }
-    }
-    function getStartDate2($conn,$organize_id){
-        $stmt = $conn->prepare("SELECT EventDateStart FROM event WHERE EventID = ?");
-        $stmt->bind_param("s",$organize_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows == 1){
-            $row = $result->fetch_assoc();
-            return $row["EventDateStart"];
-        }
-    }
-    
-    $conn = $GLOBALS['conn'];
-    $body= $request->getParsedBody();
-    $bID = $body['BoothID'];
-    $organize_id = getOr($conn,$bID);
-    // $organize_id = $body['organize_id'];
-    $startDate = getStartDate2($conn,$organize_id);
-    $today = $body['PaymentDate'];
-    $todays = date ('Y-m-d',strtotime($today));
-    $startDates = date("Y-m-d",strtotime("-5 day ",strtotime($startDate)));
-
-    if( $todays < $startDates ){
-        // $default_payment = ""; 
-        // $payment = isset($body["payment"]) ? $body["payment"] : $default_payment;
-        $stmt = $conn->prepare('UPDATE Booking SET BookStatus = "paid" , PaymentDate = ? WHERE BoothID = ?  ');
-        $stmt->bind_param('ss', $body['PaymentDate'], $body['BoothID']) ;
-        $stmt->execute();
-        $bID = $body['BoothID'];
-        function setCurrent2($conn,$bID){
-            $stmt = $conn->prepare("UPDATE Booth SET BoothStatus = 'checking' , BookStatus = 'paid'  WHERE BoothID = ?");
-            $stmt->bind_param("s",$bID);
-            $stmt->execute();
-        }
-        setCurrent2($conn,$bID);
-    }else{
-        echo 'You can not paid Bill payment';
-        function setCurrent2($conn,$bID){
-            $stmt = $conn->prepare("UPDATE Booth SET BoothName = '', Product = '', id = '',EventID = '' , BoothStatus = 'empty' , BookStatus = 'not paid'  WHERE BoothID = ?");
-            $stmt->bind_param("s",$bID);
-            $stmt->execute();
-        }
-        setCurrent2($conn,$bID);
-        
-    }
-    return $response;
-});     
-
-// 11
-$app ->post('/book/cancelBook', function (Request $request, Response $response,  array $args) {
-        $conn = $GLOBALS['conn'];
-        $body= $request->getParsedBody();
-        $bID = $body['BoothID'];
-        $stmt = $conn->prepare("UPDATE Booth SET Product ='',BoothName = '',BoothStatus = 'empty' , BookStatus = 'cancle' ,id='',EventID = ''  WHERE BoothID = ?");
-        $stmt->bind_param("s",$bID);
-        $stmt->execute();
-        return $response->withHeader('Content-Type', 'application/json');
-});
 ?>

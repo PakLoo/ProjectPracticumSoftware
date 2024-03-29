@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 use Psr\Http\Message\MessageInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-
+//1
 $app->post('/VisitorSignUp', 
         function (Request $request, Response $response, array $args){
 $conn = $GLOBALS['conn'];
@@ -25,7 +25,7 @@ return $response->withHeader('Content-Type', 'application/json');
 echo "Sign Up Success";
 
 });
-
+//2
 $app->get('/VisitorZoneBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
         $sql = "SELECT Zone.ZoneID, Zone.ZoneName, Zone.ZoneDetail, COUNT(Booth.BoothID)as BoothAmount FROM Booth INNER JOIN Zone ON Booth.ZoneID = Zone.ZoneID GROUP BY Zone.ZoneID";
@@ -40,7 +40,7 @@ $app->get('/VisitorZoneBooth', function (Request $request, Response $response, a
     
     
 });
-
+//3
 $app->get('/VisitorDetailBooth', function (Request $request, Response $response, array $args){
         $conn = $GLOBALS['conn'];
         $sql = "SELECT BoothID, BoothName, BoothSize, BoothStatus, BoothPrice FROM Booth";
