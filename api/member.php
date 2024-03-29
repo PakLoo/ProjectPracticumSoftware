@@ -93,7 +93,7 @@ $app->get('/memberCheckBoothDetail', function (Request $request, Response $respo
 });
 
 // 7 
-$app->post('/booking/checkbook', function (Request $request, Response $response, array $args) {
+$app->post('/Booking/checkbook', function (Request $request, Response $response, array $args) {
 
     $usd = $_POST['id'];
     $conn = $GLOBALS['conn'];
@@ -124,7 +124,7 @@ $app->post('/booking/checkbook', function (Request $request, Response $response,
     $rowc = mysqli_num_rows($result);
     return $response;
     if (($rowc > -1) and ($rowc < 4)){
-        echo "you can book booth"."<br>";
+        echo "you can book Booth"."<br>";
         selectBooth($conn,$response);
         return $response;
     }elseif($rowc > 3){
@@ -141,22 +141,22 @@ $app->post('/booking/checkbook', function (Request $request, Response $response,
 $app->post("/member/check", function (Request $request, Response $response, array $args) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare("SELECT count(userID) AS num_bookings FROM booking WHERE userID = ?");
-    $stmt->bind_param("i", $bodyArr["userID"]);
+    $stmt = $conn->prepare("SELECT count(id) AS num_Bookings FROM Booking WHERE id = ?");
+    $stmt->bind_param("i", $bodyArr["id"]);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($num_bookings);
+    $stmt->bind_result($num_Bookings);
     $stmt->fetch();
-    if ($num_bookings <4){
-        $x = 4-$num_bookings;
-        echo "คุณยังสามารถจองได้อีก ".$x." บูธ".'<br>';
-        $stmt = $conn->prepare("SELECT boothName from booth where boothStatus = 'ว่าง'");
+    if ($num_Bookings <4){
+        $x = 4-$num_Bookings;
+        echo "คุณยังสามารถจองได้อีก ".$x." บูธ  ";
+        $stmt = $conn->prepare("SELECT BoothName from Booth where BoothStatus = 'ว่าง'");
         $stmt->execute();
         $result = $stmt->get_result();
         $data = array();
         echo "บูธที่ยังว่างอยู่มีดังนี้ :";
         while ($row = $result -> fetch_assoc()){         
-        echo $row['boothName']." ";}
+        echo $row['BoothName']." ";}
         return $response;
     }
     else{
@@ -170,48 +170,48 @@ $app->post("/member/check", function (Request $request, Response $response, arra
 $app->post("/member/paid", function (Request $request, Response $response, array $args) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare("UPDATE booking SET paymentDate=?, bookingStatus=? WHERE boothID=?");
-    $stmt->bind_param("ssi", $bodyArr["paymentDate"], $bookingStatus, $bodyArr["boothID"]);
-    $bookingStatus = "ชำระเงิน";
+    $stmt = $conn->prepare("UPDATE Booking SET PaymentDate=?, BookStatus=? WHERE BoothID =?");
+    $stmt->bind_param("ssi", $bodyArr["PaymentDate"], $BookingStatus, $bodyArr["BoothID"]);
+    $BookingStatus = "ชำระเงิน";
     $stmt->execute();
     $result = $stmt->affected_rows;
-    $stmt3 = $conn->prepare("UPDATE booth SET boothStatus=? WHERE boothID=?");
-    $stmt3->bind_param("si", $boothStatus, $bodyArr["boothID"]);
-    $boothStatus = "จองแล้ว";
+    $stmt3 = $conn->prepare("UPDATE Booth SET BoothStatus=? WHERE BoothID=?");
+    $stmt3->bind_param("si", $BoothStatus, $bodyArr["BoothID"]);
+    $BoothStatus = "จองแล้ว";
     $stmt3->execute();
-    $stmt4 = $conn->prepare("SELECT startDate FROM event WHERE eventID=?");
-    $stmt4->bind_param("i", $bodyArr["boothID"]);
+    $stmt4 = $conn->prepare("SELECT EventDateStart FROM event WHERE EventID =?");
+    $stmt4->bind_param("i", $bodyArr["BoothID"]);
     $stmt4->execute();
     $stmt4->bind_result($startDate);
     $stmt4->fetch();
     $stmt4->close();
-    if ($startDate && $bodyArr["paymentDate"]) {
+    if ($startDate && $bodyArr["PaymentDate"]) {
             $startDateTimestamp = strtotime($startDate);
-            $paymentDateTimestamp = strtotime($bodyArr["paymentDate"]);
+            $paymentDateTimestamp = strtotime($bodyArr["PaymentDate"]);
             $daysDifference = ($paymentDateTimestamp - $startDateTimestamp) / (60 * 60 * 24);
 
             if ($daysDifference < 5) {
-                $stmt = $conn->prepare("UPDATE booking SET bookingStatus=?, userID=? WHERE boothID=?");
-                $stmt->bind_param("ssi", $bookingStatus, $userID,$bodyArr["boothID"]);
-                $bookingStatus = "ยกเลิกการจอง";
-                $userID = 0;
+                $stmt = $conn->prepare("UPDATE Booking SET BookStatus=?, id=? WHERE BoothID=?");
+                $stmt->bind_param("ssi", $BookingStatus, $id,$bodyArr["BoothID"]);
+                $BookingStatus = "ยกเลิกการจอง";
+                $id = 0;
                 $stmt->execute();
                 $result = $stmt->affected_rows;
-                $stmt3 = $conn->prepare("UPDATE booth SET boothStatus=? WHERE boothID=?");
-                $stmt3->bind_param("si", $boothStatus, $bodyArr["boothID"]);
-                $boothStatus = "ว่าง";
+                $stmt3 = $conn->prepare("UPDATE Booth SET BoothStatus=? WHERE BoothID=?");
+                $stmt3->bind_param("si", $BoothStatus, $bodyArr["BoothID"]);
+                $BoothStatus = "ว่าง";
                 $stmt3->execute();
                 $response->getBody()->write(json_encode(["message" => "ไม่สามารถชำระเงินได้"]));
                 return $response->withHeader("Content-Type", "application/json");
             } else {
-                $stmt = $conn->prepare("UPDATE booking SET paymentDate=?, bookingStatus=? WHERE boothID=?");
-                $stmt->bind_param("ssi", $bodyArr["paymentDate"], $bookingStatus, $bodyArr["boothID"]);
-                $bookingStatus = "ชำระเงิน";
+                $stmt = $conn->prepare("UPDATE Booking SET PaymentDate=?, BookStatus=? WHERE BoothID=?");
+                $stmt->bind_param("ssi", $bodyArr["PaymentDate"], $BookingStatus, $bodyArr["BoothID"]);
+                $BookingStatus = "ชำระเงิน";
                 $stmt->execute();
                 $result = $stmt->affected_rows;
-                $stmt3 = $conn->prepare("UPDATE booth SET boothStatus=? WHERE boothID=?");
-                $stmt3->bind_param("si", $boothStatus, $bodyArr["boothID"]);
-                $boothStatus = "จองแล้ว";
+                $stmt3 = $conn->prepare("UPDATE Booth SET BoothStatus=? WHERE BoothID=?");
+                $stmt3->bind_param("si", $BoothStatus, $bodyArr["BoothID"]);
+                $BoothStatus = "จองแล้ว";
                 $stmt3->execute();
                 $response->getBody()->write(json_encode(["message" => "สามารถชำระเงินได้"]));
                 return $response->withHeader("Content-Type", "application/json");
@@ -227,15 +227,15 @@ $app->post("/member/paid", function (Request $request, Response $response, array
 $app->post("/member/cancle", function (Request $request, Response $response, array $args) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $stmt = $conn->prepare("UPDATE booking SET bookingStatus=?, userID=? WHERE boothID=?");
-    $stmt->bind_param("ssi", $bookingStatus, $userID,$bodyArr["boothID"]);
-    $bookingStatus = "ยกเลิกการจอง";
-    $userID = 0;
+    $stmt = $conn->prepare("UPDATE Booking SET BookingStatus=?, id=? WHERE BoothID=?");
+    $stmt->bind_param("ssi", $BookingStatus, $id,$bodyArr["BoothID"]);
+    $BookingStatus = "ยกเลิกการจอง";
+    $id = 0;
     $stmt->execute();
     $result = $stmt->affected_rows;
-    $stmt3 = $conn->prepare("UPDATE booth SET boothStatus=? WHERE boothID=?");
-    $stmt3->bind_param("si", $boothStatus, $bodyArr["boothID"]);
-    $boothStatus = "ว่าง";
+    $stmt3 = $conn->prepare("UPDATE Booth SET BoothStatus=? WHERE BoothID=?");
+    $stmt3->bind_param("si", $BoothStatus, $bodyArr["BoothID"]);
+    $BoothStatus = "ว่าง";
     $stmt3->execute();
     $response->getBody()->write($result . "");
     return $response->withHeader("Content-Type", "application/json");
@@ -258,8 +258,8 @@ $app->post("/memberUpdate",function (Request $request,   Response $response) {
 $app->get('/member/memberBoothBook', function (Request $request, Response $response) {
     $bodyArr = $request->getParsedBody();
     $conn = $GLOBALS['conn'];
-    $sql = "select  booth.boothName, (booth.boothPrice)as Price , zone.zoneName, booth.boothStatus from booking inner join user on booking.userID = user.userID 
-            inner join booth on booking.boothID = booth.boothID inner join zone on zone.zoneID = booth.zoneID and (boothStatus = 'จองแล้ว' or boothStatus = 'อยู่ระหว่างตรวจสอบ')";
+    $sql = "select  Booth.BoothName, (Booth.BoothPrice)as Price , Zone.ZoneName, Booth.BoothStatus from Booking inner join members on Booking.id = members.id 
+            inner join Booth on Booking.BoothID = Booth.BoothID inner join Zone on Zone.ZoneID = Booth.ZoneID and (BoothStatus = 'จองแล้ว' or BoothStatus = 'อยู่ระหว่างตรวจสอบ')";
     $result = $conn->Query($sql);
     $data = array();
     while($row = $result->fetch_assoc()){
